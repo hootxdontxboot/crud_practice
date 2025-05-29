@@ -22,6 +22,7 @@ export default function Products() {
     const [products, setProducts] = useState(null)
     const [deleteID, setDeleteID] = useState(null)
     const [confirmOpen, setConfirmOpen] = useState(false)
+    const [open, setOpen] = useState(false)
     const [newProduct, setNewProduct] = useState({
         id:'',
         name: '',
@@ -55,7 +56,7 @@ export default function Products() {
     }
     const handleAddProduct = async () => {
         try{
-            const response = await axios.post('http://localhost8080/products', {
+            const response = await axios.post('http://localhost:8080/products', {
                 ...newProduct, 
                 price: parseFloat(newProduct.price)
             });
@@ -68,9 +69,16 @@ export default function Products() {
                 acquisitionDate: '',
                 price: ''
             });   
+            setOpen(false)
         }catch (error){
             console.log('There was an error adding the product!', error)
         }
+    }
+    const handleClose = () => {
+        setOpen(false)
+    }
+    const handleClickOpen = () => {
+        setOpen(true)
     }
 
 
@@ -89,7 +97,7 @@ export default function Products() {
     height ='120vh'>
     <TableContainer component={Paper} style ={{width:'70%'}}>
         <Box display = 'flex' justifyContent='flex-start'>
-        <Button variant = 'contained'>
+        <Button variant = 'contained' onClick={handleClickOpen}>
             Add New 
         </Button>
         </Box>
@@ -161,74 +169,50 @@ export default function Products() {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Product</DialogTitle>
         <DialogContent>
-          <select
-            style={{
-              width: '100%',
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              marginBottom: '15px',
-              fontSize: '16px'
-            }}
-            id="categoryid"
-            onChange={handleCategoryChange}
-            value={newProduct.categoryid}
-          >
-            <option>Choose...</option>
-            {categories.filter(c => c.title != null).map(category => (
-              <option key={category.id} value={category.id} >
-                {category.title}
-              </option>
-            ))}
-          </select>
-          <select
-            id="subcategoryid"
-            onChange={handleSubCategoryChange}
-            value={newProduct.subcategoryid}
-            style={{
-              width: '100%',
-              padding: '8px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              marginBottom: '15px',
-              fontSize: '16px'
-            }}
-          >
-            <option>Choose...</option>
-            {filteredSubCategories.map(subCategory => (
-              <option
-                key={subCategory.id} 
-                value={subCategory.id}
-              >
-                {subCategory.description}
-              </option>
-            ))}
-          </select>
           <TextField
             margin="dense"
-            name="title"
-            label="Product Title"
+            name="name"
+            label="Product Name"
             type="text"
             fullWidth
-            value={newProduct.title}
+            value={newProduct.name}
             onChange={handleChange}
           />
           <TextField
             margin="dense"
-            name="summary"
-            label="Summary"
+            name="description"
+            label="Description"
             type="text"
             fullWidth
-            value={newProduct.sumary}
+            value={newProduct.description}
             onChange={handleChange}
           />
           <TextField
             margin="dense"
-            name="content"
-            label="Content"
+            name="brand"
+            label="Brand"
             type="text"
             fullWidth
-            value={newProduct.content}
+            value={newProduct.brand}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="acquisitionDate"
+            label="Acquisition Date"
+            type="date"
+            fullWidth
+            value={newProduct.acquisitionDate}
+            onChange={handleChange}
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            margin="dense"
+            name="price"
+            label="Price"
+            type="number"
+            fullWidth
+            value={newProduct.price}
             onChange={handleChange}
           />
         </DialogContent>
