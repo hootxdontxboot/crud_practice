@@ -8,23 +8,40 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box'
-
-function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-  }
-  
-  const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-  ];
-  
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 export default function Products() {
 
     const [products, setProducts] = useState(null)
+    const [deleteID, setDeleteID] = useState(null)
+    const [confirmOpen, setConfirmOpen] = useState(false)
+
+    const handleConfirmOpen = (id) => {
+        setDeleteID(id)
+        setConfirmOpen(true)
+        
+    }
+    const handleConfirmClose = (id) => {
+        setDeleteID(null)
+        setConfirmOpen(false)
+    }
+    const handleDelete = async (id) => {
+        try{
+            await axios.delete(`http://localhost:8080/product/${id}`)
+            setProducts(products.filter(product => product.id !== id));
+            handleConfirmClose()
+        }catch (error) {
+            console.log('Error occured during deleting the product : ', error);
+            alert('There was an error deleting the product please try again');
+        }
+    }
+
 
     useEffect(() => {
         axios.get('http://localhost:8080/products').then(response => {
@@ -44,11 +61,12 @@ export default function Products() {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell align="right">Name</TableCell>
-            <TableCell align="right">Description</TableCell>
-            <TableCell align="right">Brand</TableCell>
-            <TableCell align="right">Acquistion Date</TableCell>
-            <TableCell align="right">Price</TableCell>
+            <TableCell align="left">Name</TableCell>
+            <TableCell align="left">Description</TableCell>
+            <TableCell align="left">Brand</TableCell>
+            <TableCell align="left">Acquistion Date</TableCell>
+            <TableCell align="left">Price</TableCell>
+            <TableCell align="left">Actions</TableCell>
           </TableRow>
         </TableHead>
                 <TableBody>
@@ -56,12 +74,19 @@ export default function Products() {
                 <TableRow
                     key={product.id}
                 >
-                    <TableCell align="right">{product.id}</TableCell>
-                    <TableCell align="right">{product.name}</TableCell>
-                    <TableCell align="right">{product.description}</TableCell>
-                    <TableCell align="right">{product.brand}</TableCell>
-                    <TableCell align="right">{product.acquisitionDate}</TableCell>
-                    <TableCell align="right">{product.price}</TableCell>
+                    <TableCell align="left">{product.id}</TableCell>
+                    <TableCell align="left">{product.name}</TableCell>
+                    <TableCell align="left">{product.description}</TableCell>
+                    <TableCell align="left">{product.brand}</TableCell>
+                    <TableCell align="left">{product.acquisitionDate}</TableCell>
+                    <TableCell align="left">${product.price}</TableCell>
+                    <TableCell align="center">
+                        <IconButton color = 'secondary' onClick = {() => handleConfirmOpen(product.id)}>
+                            <DeleteIcon>
+
+                            </DeleteIcon>
+                        </IconButton>
+                    </TableCell>
                 </TableRow>
                 ))
              : (
@@ -74,6 +99,28 @@ export default function Products() {
         </TableBody>
       </Table>
     </TableContainer>
+        {/* Confirmation Dialog for Deletion */}
+        <Dialog open={confirmOpen}
+            onClose={handleConfirmClose}>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogContent>
+            Are you sure you want to delete this product?
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={handleConfirmClose} color="primary">
+                Cancel
+            </Button>
+            <Button
+                onClick={() => {
+                handleDelete(deleteID);
+                }}
+                color="secondary"
+                variant="contained"
+            >
+                Delete
+            </Button>
+            </DialogActions>
+        </Dialog>
     </Box>
   )
 }
