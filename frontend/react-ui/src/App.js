@@ -1,10 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
+import ButtonAppBar from './components/Appbar';
+import Products from './components/Products';
+
 
 function App() {
   return (
     <div className="App">
-      <h1> Welcome to React/Spring Project</h1>
+      <ButtonAppBar></ButtonAppBar>
+      <h1>Welcome to React</h1>
+      <Products></Products>
     </div>
   );
 }
