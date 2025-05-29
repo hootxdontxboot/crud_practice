@@ -1,5 +1,8 @@
+package com.hunterwhite.demo_spring_api;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 
 @Repository
 

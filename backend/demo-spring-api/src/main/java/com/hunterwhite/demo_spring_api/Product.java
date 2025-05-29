@@ -1,3 +1,5 @@
+package com.hunterwhite.demo_spring_api;
+
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;

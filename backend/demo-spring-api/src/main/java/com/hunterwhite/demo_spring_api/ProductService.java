@@ -1,3 +1,4 @@
+package com.hunterwhite.demo_spring_api;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class ProductService {
     public Product updateProduct(Product product) { return productRepository.save(product);}
 
     public void deleteProduct(Long id) { productRepository.deleteById(id);}
-    
+
 
 
 }
