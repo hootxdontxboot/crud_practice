@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -25,6 +26,7 @@ export default function Products() {
     const [deleteID, setDeleteID] = useState(null)
     const [confirmOpen, setConfirmOpen] = useState(false)
     const [open, setOpen] = useState(false)
+    const [openEdit, setOpenEdit] = useState(false)
     const [newProduct, setNewProduct] = useState({
         id:'',
         name: '',
@@ -33,6 +35,26 @@ export default function Products() {
         acquisitionDate: '',
         price: ''
     })
+    const [editProduct, setEditProduct] = useState({
+        //Will be updated once setEditProduct is called when we click the button in table row 
+        id:null,
+        name: '',
+        description: '',
+        brand: '',
+        acquisitionDate: '',
+        price: ''
+    })
+    const handleClickOpenEdit = (product) => {
+        setEditProduct(product)
+        setOpenEdit(true)
+    }
+
+    const handleCloseEdit = () => {
+        setOpenEdit(false)
+    }
+    const handleChangeEdit = (e) => {
+        setEditProduct({...editProduct, [e.target.name]: e.target.value})
+    }
 
     const handleConfirmOpen = (id) => {
         setDeleteID(id)
@@ -55,6 +77,24 @@ export default function Products() {
     }
     const handleChange = (e) => {
         setNewProduct({...newProduct, [e.target.name]: e.target.value});
+    }
+
+    const handleEditProduct = async () => {
+        try{
+            const response = await axios.put(`http://localhost:8080/product/${editProduct.id}`, {
+                ...editProduct,
+                price: parseFloat(editProduct.price),
+
+            });
+            setProducts(products.map(product =>
+                product.id=== editProduct.id ? response.data : product
+            ));
+            handleCloseEdit();
+            
+        }catch (error){
+            console.log('Error Occured while updating the product : ', error)
+            alert('There was an error updating the product please try again')
+        }
     }
     const handleAddProduct = async () => {
         try{
@@ -96,7 +136,7 @@ export default function Products() {
     display ='flex'
     justifyContent ='center'
     alignItems = 'center'
-    height ='120vh'>
+    height ='150vh'>
     <TableContainer component={Paper} style ={{width:'70%'}}>
         <Box display = 'flex' justifyContent='flex-start'>
         <Button variant = 'contained' onClick={handleClickOpen}>
@@ -131,6 +171,11 @@ export default function Products() {
                             <DeleteIcon>
 
                             </DeleteIcon>
+                        </IconButton>
+                        <IconButton color = 'secondary' onClick = {() => handleClickOpenEdit(product)}>
+                            <EditIcon>
+
+                            </EditIcon>
                         </IconButton>
                     </TableCell>
                 </TableRow>
@@ -167,7 +212,7 @@ export default function Products() {
             </Button>
             </DialogActions>
         </Dialog>
-        {/* Modal Dialog for Adding New Product */}
+    {/* Modal Dialog for Adding New Product */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Product</DialogTitle>
         <DialogContent>
@@ -224,6 +269,66 @@ export default function Products() {
           </Button>
           <Button onClick={handleAddProduct} color="primary" variant="contained">
             Add Product
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Modal Dialog for Editing Existing Product */}
+      <Dialog open={openEdit} onClose={handleCloseEdit}>
+        <DialogTitle>Edit Product</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            name="name"
+            label="Product Name"
+            type="text"
+            fullWidth
+            value={editProduct.name}
+            onChange={handleChangeEdit}
+          />
+          <TextField
+            margin="dense"
+            name="description"
+            label="Description"
+            type="text"
+            fullWidth
+            value={editProduct.description}
+            onChange={handleChangeEdit}
+          />
+          <TextField
+            margin="dense"
+            name="brand"
+            label="Brand"
+            type="text"
+            fullWidth
+            value={editProduct.brand}
+            onChange={handleChangeEdit}
+          />
+          <TextField
+            margin="dense"
+            name="acquisitionDate"
+            label="Acquisition Date"
+            type="date"
+            fullWidth
+            value={editProduct.acquisitionDate}
+            onChange={handleChangeEdit}
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            margin="dense"
+            name="price"
+            label="Price"
+            type="number"
+            fullWidth
+            value={editProduct.price}
+            onChange={handleChangeEdit}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEdit} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleEditProduct} color="primary" variant="contained">
+            Update Product
           </Button>
         </DialogActions>
       </Dialog>
